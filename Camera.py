@@ -7,7 +7,12 @@
 ########################################################################
 
 from io import BytesIO
+
+import time
 from time import sleep
+
+import numpy as np
+import cv2
 
 import picamera
 from picamera import PiCamera
@@ -82,6 +87,24 @@ class Camera():
 		else:
 			self.LED = True
 		self.camera.led = self.LED
+		
+	def capture_to_numpy_ary(self):
+		with self.camera as camera:
+			camera.resolution = (320, 240)
+			camera.framerate = 24
+			time.sleep(2)
+			output = np.empty(240, 320, 3)), dtype=np.unit8)
+			camera.capture(output, 'rgb')
+			
+	def capture_to_OpenCV(self):
+		with self.camera as camera:
+			camera.resolution(320, 240)
+			camera.framerate = 24
+			time.sleep(2)
+			image = np.empty((240 * 320 * 3,), dtype=np.unit8)
+			camera.capture(image, 'bgr')
+			image = image.reshape((240, 320, 3))
+			return image
 		
 	def zoom(self, n):
 		camera.zoom((n/100., n/100., 0.5, 0.5)
